@@ -1,3 +1,7 @@
+/**
+ * author:  hyerim K
+ * note:    external sensor modules of sleep monitoring service 'croissant'
+ */
 
 const express = require('express')
 const app = express()
