@@ -7,8 +7,8 @@
 const gpio = require('wiring-pi')
 const request = require('../lib/request')
 
-let sleepMode = 'off'
-let securityMode = 'off'
+let sleepMode = false
+let securityMode = false
 
 const fire = {
   //member variables
@@ -46,7 +46,7 @@ const buzzer_act = {
 
 const buzzer_pas = {
   //member variables
-  PIN: 25,
+  PIN: 5,
   time: 200,
 
   //function
@@ -74,19 +74,12 @@ const button = {
     setInterval( () => {
       const data = gpio.digitalRead( this.PIN )
       if( !data ){
-        sleepMode = sleepMode=='on' ? 'off'  : 'on'
+        sleepMode = sleepMode ? false : true
 	console.log(sleepMode)
 	securityMode = sleepMode
-	request('post', `/sleep/${sleepMode}`)
-	buzzer_pas.write()
-        console.log("button pushed!")
-        if(sleepMode=='on'){
-	  led.on()
-	}
-	else {
-	  led.off()
-	}
+	request('post', `/sleep/${sleepMode ? 'on' : 'off'}`)
 
+        console.log("button pushed!")
       }
       else {
 

@@ -1,32 +1,11 @@
 
 const util = require('../lib/util')
-const send = require('../lib/send')
+const request = require('../lib/request')
 
-console.log(util.rand(0, 1))
-
-let OnoFF; //C#의 var 
-
-/*if(OnOff == true)
-    send('/event/fire')
-if(OnOff == false)
-    send('/event/fire')*/
-
-send('/security/on') //on 요청 보냄. off는 on만 off로.
-
-let OnOff = send('/security') // 보안 상태를 받음.
-
-if (OnOff == true) //OnOff의 판단 여부를 가림.
-{
-    send('/security/off')
-}
-
+let modeState = 'off';
 let prevValue = 0;
 let Count = 0;
-
-
-/*const tossAndTurnData = {
-    tossCount: 0
-}*/
+let tossAndTurnData = 0;
 
 const gpio = require('wiring-pi')
 const BALLTILT = 29
@@ -41,16 +20,22 @@ gpio.pinMode(TOUCHED, gpio.INPUT)
 console.log(data)
 }, 500)*/
 
-setInterval(TossAndTurn, 500)
-setInterval(SecurityRequest, 500)
+ setInterval(TossAndTurn, 500)
+ setInterval(SecurityRequest, 100)
+ setInterval(SetServer, 1000)
 
 function TossAndTurn() {
-    prevValue = data
-    const data = gpio.digitalRead(BALLTILT)
+    if(modeState == 'off')
+	    return
 
-    if(prevValue != data)
+    prevValue = tossAndTurnData
+    const data = gpio.digitalRead(BALLTILT)
+    tossAndTurnData = data
+
+
+    if(prevValue != tossAndTurnData)
         Count++
-    //console.log(data)
+    console.log('trunCount : ' +  Count)
 }
 
 function SecurityRequest() {
@@ -58,15 +43,26 @@ function SecurityRequest() {
 
     if(data)
     {
-        if("보안 온")
+        if(modeState == 'off')
         {
-            send('/security/off')
-        }
-        else {
-            send('/security/on')
-        }
+	//	console.log(modeState)
+            request('post', '/security/on')
+//	    console.log('securityState : ' + modeState)
+	}
+        else if(modeState == 'on') {
+	//	console.log(modeSt`ate)
+            request('post', '/security/off')
+ //           console.log('securityState : ' + modeState)
+	}
     }
+    
 }
 
-
+function SetServer() {
+	request('get', '/security')
+	.then(onoff => {
+		modeState = onoff
+		console.log(modeState)
+	})
+}
 ///////////////////////////////////////////////////////
