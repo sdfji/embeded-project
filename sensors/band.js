@@ -12,12 +12,18 @@ let period = 100; //측정 주기.
 
 
 const gpio = require('wiring-pi')
+const mcpadc = require('mcp-adc')
 const BALLTILT = 29
 const TOUCHED = 28
-const HEARTBEAT = 25
+const HEARTBEAT = new mcpadc.Mcp3208()
+const CS_MCP3208 = 10
+const SPI_CHANNEL = 0
+const SPI_SPEED = 1000000
+
 //const util = require()
 
 gpio.wiringPiSetup()
+gpio.wiringPiPISetup(SPI_CHANNEL, SPI_SPEED)
 gpio.pinMode(BALLTILT, gpio.INPUT)
 gpio.pinMode(TOUCHED, gpio.INPUT)
 gpio.pinMode(HEARTBEAT, gpio.INPUT)
@@ -67,12 +73,14 @@ function SecurityRequest() {
 
 function HeartBeatInfo()
 {
-    const rawValue = gpio.analogRead(HEARTBEAT)
-    let value = alpha * oldValue + (1 - alpha) * rawValue;
+    const rawValue = HEARTBEAT.readRawValue(SPI_CHANNEL, function(value)
+    {
+        value = alpha * oldValue + (1 - alpha) * rawValue;
 
-    console.log(rawValue)
-    console.log('VALUE : ' + value);
-    oldValue = rawValue
+        console.log(rawValue)
+        console.log('VALUE : ' + value);
+        oldValue = rawValue
+    })
 }
 
 function SetServer() {
