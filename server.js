@@ -1,14 +1,68 @@
+/**
+ *  author: nupamore
+ *    note: express server
+ */
 
 const express = require('express')
-const app = express()
+const bodyParser = require('body-parser')
+// const external = require('./sensors/etc')
+// external.init()
 
+const app = express()
+app.use(bodyParser.json())
 app.use(express.static('view'))
 
-app.post('/event/fire', (req, res) => {
-  console.log('fire!!')
-  res.send('ok')
+
+let sleepMode = 'off'
+let securityMode = 'off'
+
+
+/**
+ * alarm
+ */
+app.get('/alarm', (req, res) => {
 })
+
+app.post('/alarm', (req, res) => {
+})
+
+/**
+ * sleep
+ */
+app.get('/sleep', (req, res) => {
+  res.send(sleepMode)
+})
+
+app.get('/sleep/:day', (req, res) => {
+})
+
+app.post('/sleep/:onoff', (req, res) => {
+  sleepMode = req.params.onoff
+  console.log(`sleepMode = ${sleepMode}`)
+  res.sendStatus(200)
+})
+
+app.put('/sleep', (req, res) => {
+})
+
+/**
+ * security
+ */
+app.get('/security', (req, res) => {
+  res.send(securityMode)
+})
+
+app.post('/security/:onoff', (req, res) => {
+  securityMode = req.params.onoff
+  console.log(`securityMode = ${securityMode}`)
+  res.sendStatus(200)
+})
+
+app.put('/security', (req, res) => {
+})
+
 
 app.listen(17919, () => {
   console.log('http://localhost:17919')
 })
+
