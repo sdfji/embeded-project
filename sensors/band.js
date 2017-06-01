@@ -23,19 +23,21 @@ const SPI_SPEED = 1000000
 //const util = require()
 
 gpio.wiringPiSetup()
-gpio.wiringPiPISetup(SPI_CHANNEL, SPI_SPEED)
+gpio.wiringPiSPISetup(SPI_CHANNEL, SPI_SPEED)
 gpio.pinMode(BALLTILT, gpio.INPUT)
 gpio.pinMode(TOUCHED, gpio.INPUT)
-gpio.pinMode(HEARTBEAT, gpio.INPUT)
+gpio.pinMode(CS_MCP3208, gpio.OUTPUT)
 /*setInterval(() => {
     const data = gpio.digitalRead(BALLTILT)
 console.log(data)
 }, 500)*/
 
+
  setInterval(TossAndTurn, 500)
  setInterval(SecurityRequest, 100)
  setInterval(SetServer, 1000)
  setInterval(HeartBeatInfo, 100)
+
 
 function TossAndTurn() {
     if(modeState == 'off')
@@ -73,13 +75,12 @@ function SecurityRequest() {
 
 function HeartBeatInfo()
 {
-    const rawValue = HEARTBEAT.readRawValue(SPI_CHANNEL, function(value)
-    {
-        value = alpha * oldValue + (1 - alpha) * rawValue;
+    HEARTBEAT.readRawValue(SPI_CHANNEL, function(rawValue) {
+        const value = alpha * oldValue + (1 - alpha) * rawValue;
 
-        console.log(rawValue)
-        console.log('VALUE : ' + value);
-        oldValue = rawValue
+        console.log(value)
+        console.log('RAW_VALUE : ' + rawValue);
+        oldValue = value
     })
 }
 
